@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Wijaya+Nura Iq</title>
     
-    <!-- Framework & Icons -->
+    <!-- CSS & Icons -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
     
@@ -25,19 +25,18 @@
         .custom-scrollbar::-webkit-scrollbar { width: 4px; }
         .custom-scrollbar::-webkit-scrollbar-thumb { background: rgba(0,0,0,0.05); border-radius: 10px; }
         
-        /* Animations */
         @keyframes pop { 0% { transform: scale(0.9); opacity: 0; } 100% { transform: scale(1); opacity: 1; } }
         .animate-pop { animation: pop 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
         @keyframes float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-10px); } }
         .animate-float { animation: float 4s ease-in-out infinite; }
-        @keyframes bounce { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-15px); } }
         .sticker-bounce { animation: bounce 2s ease-in-out infinite; }
+        @keyframes bounce { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-15px); } }
 
-        /* UI Styles */
-        .glass-nav { background: rgba(255, 255, 255, 0.9); backdrop-filter: blur(10px); border-bottom: 1px solid #f1f5f9; }
-        .card-shadow { box-shadow: 0 4px 20px -2px rgba(0,0,0,0.05); }
+        .glass-nav { background: rgba(255, 255, 255, 0.9); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); border-bottom: 1px solid #f1f5f9; }
         .aura-wijaya { background: radial-gradient(circle at top right, rgba(249, 115, 22, 0.1), transparent); }
         .aura-nura { background: radial-gradient(circle at top right, rgba(20, 184, 166, 0.1), transparent); }
+        
+        #focus-target { position: absolute; cursor: pointer; transition: all 0.1s ease; z-index: 10; }
     </style>
 </head>
 <body>
@@ -46,235 +45,207 @@
     <div id="view-splash" class="view active items-center justify-center bg-white p-8">
         <div class="flex gap-4 mb-10" id="splash-logos"></div>
         <h1 class="text-4xl font-black italic text-slate-800 uppercase tracking-tighter">Wijaya+Nura <span class="text-orange-500">Iq</span></h1>
-        <p class="text-[10px] font-bold text-slate-300 uppercase tracking-[0.5em] mt-4">Production Ready v20.0</p>
+        <p class="text-[10px] font-bold text-slate-300 uppercase tracking-[0.5em] mt-4">Fixed Master v22.0</p>
     </div>
 
-    <!-- App Main Container -->
-    <div id="app-main" class="hidden h-screen w-full flex items-center justify-center bg-slate-50">
-        <div class="w-full max-w-md h-full bg-white relative flex flex-col overflow-hidden shadow-2xl md:rounded-[3rem] md:h-[95vh] border border-white" id="main-frame">
+    <!-- Main Shell -->
+    <div id="app-shell" class="hidden h-screen w-full flex items-center justify-center bg-slate-50 md:p-4">
+        <div id="main-frame" class="w-full max-w-md h-full bg-white relative flex flex-col overflow-hidden shadow-2xl md:rounded-[3rem] md:h-[95vh] border border-white aura-wijaya">
             
             <!-- Header -->
             <header class="px-6 py-5 flex items-center justify-between glass-nav z-50 shrink-0">
-                <div class="flex items-center gap-3 cursor-pointer" onclick="changeView('menu')">
+                <div class="flex items-center gap-3 cursor-pointer" onclick="showView('menu')">
                     <div id="header-logo" class="w-8 h-8"></div>
-                    <div class="flex flex-col leading-none">
-                        <span class="font-black italic text-sm text-slate-800">Wijaya+Nura Iq</span>
+                    <div class="flex flex-col">
+                        <span class="font-black italic text-sm text-slate-800 leading-none">Wijaya+Nura Iq</span>
                         <span id="ai-label" class="text-[8px] font-bold uppercase tracking-widest mt-1 text-orange-500">Logic Pro</span>
                     </div>
                 </div>
                 <div class="flex items-center gap-2">
-                    <button onclick="switchAI()" class="px-3 py-1.5 rounded-full border text-[9px] font-black uppercase transition-all bg-slate-50 flex items-center gap-2">
-                        <i data-lucide="refresh-cw" class="w-3 h-3 text-slate-400"></i> Switch
+                    <button onclick="toggleAI()" class="px-3 py-1.5 rounded-full border border-slate-100 text-[9px] font-black uppercase transition-all bg-slate-50 flex items-center gap-2">
+                        <i data-lucide="refresh-cw" class="w-3 h-3"></i> Switch
                     </button>
-                    <button onclick="changeView('chat')" id="chat-tab-btn" class="w-9 h-9 rounded-xl flex items-center justify-center transition-all bg-slate-50 text-slate-300">
-                        <i data-lucide="sparkles" class="w-4 h-4"></i>
+                    <button onclick="showView('chat')" id="chat-tab-btn" class="w-10 h-10 rounded-xl flex items-center justify-center transition-all bg-slate-50 text-slate-300">
+                        <i data-lucide="sparkles" class="w-5 h-5"></i>
                     </button>
                 </div>
             </header>
 
-            <!-- Scrollable Content -->
+            <!-- Views Container -->
             <div id="view-container" class="flex-1 relative overflow-hidden">
                 
-                <!-- MENU -->
+                <!-- MENU VIEW -->
                 <div id="view-menu" class="view p-8 space-y-8 animate-pop custom-scrollbar">
                     <div class="space-y-1">
-                        <h2 id="hero-text" class="text-5xl font-extrabold italic tracking-tighter leading-[0.9] text-slate-900">Break Your Limit.</h2>
-                        <p class="text-slate-400 text-sm font-medium mt-3">Sistem asisten kecerdasan dan mental terintegrasi.</p>
+                        <h2 id="menu-hero" class="text-5xl font-extrabold italic tracking-tighter leading-[0.9] text-slate-900">Break Your Limit.</h2>
+                        <p class="text-slate-400 text-sm font-medium mt-3 leading-relaxed">Uji kecerdasan dan tubuh lo secara fungsional bersama AI.</p>
                     </div>
 
-                    <div id="menu-wijaya" class="space-y-6">
-                        <p class="text-[10px] font-black uppercase tracking-widest text-slate-300">Triple IQ Hub</p>
+                    <div id="menu-wijaya-content" class="space-y-6">
+                        <p class="text-[10px] font-black uppercase tracking-widest text-slate-300 italic">Triple IQ Hub</p>
                         <div class="grid grid-cols-1 gap-3">
-                            <button onclick="startQuiz('LOGIC')" class="p-6 bg-white border border-slate-100 rounded-[2rem] flex items-center gap-5 active:scale-95 card-shadow group">
+                            <button onclick="startQuiz('IQ_LOGIC')" class="p-6 bg-white border border-slate-100 rounded-[2.5rem] flex items-center gap-5 active:scale-95 shadow-sm group">
                                 <div class="w-12 h-12 rounded-2xl bg-blue-500 flex items-center justify-center text-white shadow-lg"><i data-lucide="brain"></i></div>
-                                <span class="font-bold text-slate-700 uppercase text-xs tracking-wider">IQ Logika</span>
+                                <div class="text-left flex-1"><h4 class="font-bold text-slate-700">IQ LOGIKA</h4><p class="text-[9px] text-slate-400 uppercase font-black tracking-widest">Pola & Kognitif</p></div>
                             </button>
-                            <button onclick="startQuiz('VERBAL')" class="p-6 bg-white border border-slate-100 rounded-[2rem] flex items-center gap-5 active:scale-95 card-shadow">
+                            <button onclick="startQuiz('IQ_VERBAL')" class="p-6 bg-white border border-slate-100 rounded-[2.5rem] flex items-center gap-5 active:scale-95 shadow-sm group">
                                 <div class="w-12 h-12 rounded-2xl bg-purple-500 flex items-center justify-center text-white shadow-lg"><i data-lucide="languages"></i></div>
-                                <span class="font-bold text-slate-700 uppercase text-xs tracking-wider">IQ Verbal</span>
+                                <div class="text-left flex-1"><h4 class="font-bold text-slate-700">IQ VERBAL</h4><p class="text-[9px] text-slate-400 uppercase font-black tracking-widest">Bahasa & Analogi</p></div>
                             </button>
-                            <button onclick="startQuiz('MATH')" class="p-6 bg-white border border-slate-100 rounded-[2rem] flex items-center gap-5 active:scale-95 card-shadow">
+                            <button onclick="startQuiz('IQ_MATH')" class="p-6 bg-white border border-slate-100 rounded-[2.5rem] flex items-center gap-5 active:scale-95 shadow-sm group">
                                 <div class="w-12 h-12 rounded-2xl bg-indigo-500 flex items-center justify-center text-white shadow-lg"><i data-lucide="binary"></i></div>
-                                <span class="font-bold text-slate-700 uppercase text-xs tracking-wider">IQ Numerik</span>
+                                <div class="text-left flex-1"><h4 class="font-bold text-slate-700">IQ NUMERIK</h4><p class="text-[9px] text-slate-400 uppercase font-black tracking-widest">Matematika Cepat</p></div>
                             </button>
                             <div class="grid grid-cols-2 gap-3 mt-1">
                                 <button onclick="startFocus()" class="p-5 bg-amber-50 border border-amber-100 rounded-[2rem] flex flex-col items-center gap-2 active:scale-95">
                                     <div class="w-10 h-10 rounded-2xl bg-amber-500 flex items-center justify-center text-white shadow-lg"><i data-lucide="zap"></i></div>
-                                    <span class="font-black text-[9px] text-amber-600 uppercase">Fokus</span>
+                                    <span class="font-black text-[9px] text-amber-600 uppercase tracking-tighter">Fokus</span>
                                 </button>
-                                <button onclick="changeView('health')" class="p-5 bg-orange-50 border border-orange-100 rounded-[2rem] flex flex-col items-center gap-2 active:scale-95">
+                                <button onclick="showView('health')" class="p-5 bg-orange-50 border border-orange-100 rounded-[2rem] flex flex-col items-center gap-2 active:scale-95">
                                     <div class="w-10 h-10 rounded-2xl bg-orange-500 flex items-center justify-center text-white shadow-lg"><i data-lucide="activity"></i></div>
-                                    <span class="font-black text-[9px] text-orange-600 uppercase">Obesitas</span>
+                                    <span class="font-black text-[9px] text-orange-600 uppercase tracking-tighter">Obesitas</span>
                                 </button>
                             </div>
                         </div>
                     </div>
 
-                    <div id="menu-nura" class="space-y-6 hidden">
-                        <p class="text-[10px] font-black uppercase tracking-widest text-slate-300">Emotional Support</p>
-                        <button onclick="changeView('chat')" class="w-full p-8 bg-teal-50 border-2 border-dashed border-teal-200 rounded-[3rem] flex items-center gap-6 active:scale-95 shadow-sm group">
-                            <div class="w-16 h-16 rounded-[1.8rem] bg-teal-500 flex items-center justify-center text-white shadow-xl shadow-teal-100 group-hover:rotate-12 transition-transform"><i data-lucide="flower"></i></div>
+                    <div id="menu-nura-content" class="space-y-6 hidden">
+                        <p class="text-[10px] font-black uppercase tracking-widest text-slate-300 italic">Soul Support</p>
+                        <button onclick="showView('chat')" class="w-full p-8 bg-teal-50 border-2 border-dashed border-teal-200 rounded-[3.5rem] flex items-center gap-6 active:scale-95 group">
+                            <div class="w-16 h-16 rounded-[1.8rem] bg-teal-500 flex items-center justify-center text-white shadow-xl shadow-teal-100 group-hover:rotate-12 transition-all"><i data-lucide="flower"></i></div>
                             <div class="text-left flex-1 font-black text-2xl text-teal-900 leading-none">Curhat</div>
                             <i data-lucide="arrow-right" class="text-teal-300"></i>
                         </button>
-                        <button onclick="startQuiz('EQ')" class="p-6 bg-white border border-slate-100 rounded-[2.5rem] flex items-center gap-5 active:scale-95 card-shadow">
+                        <button onclick="startQuiz('EQ')" class="p-6 bg-white border border-slate-100 rounded-[2.5rem] flex items-center gap-5 active:scale-95 shadow-sm group">
                             <div class="w-12 h-12 rounded-2xl bg-rose-500 flex items-center justify-center text-white shadow-lg"><i data-lucide="heart"></i></div>
-                            <span class="font-bold text-slate-700 uppercase text-xs tracking-wider">Kecerdasan Emosi</span>
+                            <div class="text-left flex-1"><h4 class="font-bold text-slate-700 uppercase text-xs tracking-widest">Kecerdasan Emosi</h4></div>
+                        </button>
+                        <button onclick="startQuiz('SQ')" class="p-6 bg-white border border-slate-100 rounded-[2.5rem] flex items-center gap-5 active:scale-95 shadow-sm group">
+                            <div class="w-12 h-12 rounded-2xl bg-emerald-500 flex items-center justify-center text-white shadow-lg"><i data-lucide="users"></i></div>
+                            <div class="text-left flex-1"><h4 class="font-bold text-slate-700 uppercase text-xs tracking-widest">Kecerdasan Sosial</h4></div>
                         </button>
                     </div>
+
+                    <button onclick="showView('chat')" class="w-full p-7 bg-slate-900 text-white rounded-[2.5rem] font-black uppercase italic tracking-widest text-xs flex items-center justify-center gap-4 shadow-2xl active:scale-95 transition-all mt-4" id="main-chat-btn">
+                         Diskusi Sekarang
+                    </button>
                 </div>
 
-                <!-- QUIZ -->
-                <div id="view-quiz" class="view p-8 pt-4 space-y-8 animate-pop">
-                    <div class="flex justify-between items-center text-[10px] font-black text-orange-500 uppercase tracking-widest">
-                        <span id="quiz-cat">LOGIC</span>
-                        <span id="quiz-idx">1/10</span>
+                <!-- QUIZ VIEW -->
+                <div id="view-quiz" class="view pt-4 space-y-8 animate-pop p-8">
+                    <div class="flex justify-between items-center text-[10px] font-black text-orange-500 uppercase tracking-[0.2em]">
+                        <span id="quiz-cat-label">MODE</span>
+                        <span id="quiz-progress-label">1/10</span>
                     </div>
-                    <div class="w-full bg-slate-100 h-2 rounded-full overflow-hidden">
-                        <div id="quiz-progress" class="h-full bg-orange-500 transition-all duration-500" style="width: 10%"></div>
+                    <div class="w-full bg-slate-100 h-2 rounded-full overflow-hidden shadow-inner">
+                        <div id="quiz-progress-bar" class="h-full bg-orange-500 transition-all duration-500" style="width: 10%"></div>
                     </div>
-                    <div class="bg-white p-8 rounded-[3rem] border border-slate-100 card-shadow text-center flex items-center justify-center min-h-[14rem]">
+                    <div class="bg-white p-10 rounded-[3rem] border border-slate-100 shadow-sm text-center flex items-center justify-center min-h-[14rem] relative overflow-hidden">
+                        <div class="absolute top-0 right-0 w-24 h-24 bg-orange-50 rounded-full -mr-12 -mt-12 opacity-50 blur-2xl"></div>
                         <h2 id="q-text" class="text-2xl font-bold text-slate-800 leading-snug">Memuat...</h2>
                     </div>
                     <div id="q-options" class="grid gap-3"></div>
                 </div>
 
-                <!-- HEALTH / OBESITY -->
-                <div id="view-health" class="view p-8 items-center justify-center space-y-8 animate-pop">
-                    <h2 class="text-4xl font-black text-slate-900 italic text-center tracking-tighter leading-none">Status Tubuh.</h2>
+                <!-- HEALTH VIEW -->
+                <div id="view-health" class="view items-center justify-center space-y-8 animate-pop p-8">
+                    <h2 class="text-4xl font-black text-slate-900 italic text-center tracking-tighter">Status Tubuh.</h2>
                     <div class="w-full space-y-5">
                         <div class="space-y-2">
                             <label class="text-[10px] font-black uppercase tracking-widest text-slate-300 ml-5">Tinggi (cm)</label>
-                            <input type="number" id="h-in" placeholder="Contoh: 175" class="w-full p-6 bg-slate-50 border border-slate-100 rounded-[2rem] focus:ring-4 focus:ring-orange-500/10 text-sm shadow-inner" />
+                            <input type="number" id="in-height" placeholder="Contoh: 175" class="w-full p-6 bg-slate-50 border border-slate-100 rounded-[2rem] focus:ring-4 focus:ring-orange-500/10 text-sm shadow-inner" />
                         </div>
                         <div class="space-y-2">
                             <label class="text-[10px] font-black uppercase tracking-widest text-slate-300 ml-5">Berat (kg)</label>
-                            <input type="number" id="w-in" placeholder="Contoh: 70" class="w-full p-6 bg-slate-50 border border-slate-100 rounded-[2rem] focus:ring-4 focus:ring-orange-500/10 text-sm shadow-inner" />
+                            <input type="number" id="in-weight" placeholder="Contoh: 70" class="w-full p-6 bg-slate-50 border border-slate-100 rounded-[2rem] focus:ring-4 focus:ring-orange-500/10 text-sm shadow-inner" />
                         </div>
-                        <button onclick="checkBMI()" class="w-full p-7 bg-orange-500 text-white font-black rounded-[2.5rem] shadow-xl active:scale-95 uppercase tracking-widest text-xs italic">Hitung Sekarang!</button>
+                        <button onclick="calculateBMI()" class="w-full p-7 bg-orange-500 text-white font-black rounded-[2.5rem] shadow-xl active:scale-95 uppercase tracking-widest text-xs italic">Analisis BMI!</button>
                     </div>
                 </div>
 
-                <!-- FOCUS -->
-                <div id="view-focus" class="view p-8 pt-4 animate-pop">
-                    <div class="flex justify-between items-center text-[10px] font-black text-orange-500 uppercase mb-4">
-                        <span>Reaction Test</span>
-                        <span id="f-hit-count">0/5 Hit</span>
+                <!-- FOCUS VIEW -->
+                <div id="view-focus" class="view pt-4 animate-pop p-8">
+                    <div class="flex justify-between items-center text-[10px] font-black text-orange-500 tracking-widest uppercase mb-4">
+                        <span>Reflex Master</span>
+                        <span id="f-count">0/5 Hit</span>
                     </div>
                     <div id="f-area" class="flex-1 bg-slate-50 rounded-[4rem] border-2 border-dashed border-slate-200 relative overflow-hidden shadow-inner flex items-center justify-center">
-                        <div id="f-msg" class="text-slate-300 font-black italic uppercase text-xs">Fokus... Tunggu...</div>
-                        <div id="f-target" class="hidden cursor-pointer" style="position: absolute;"></div>
+                        <div id="f-placeholder" class="text-slate-300 font-black italic uppercase text-xs">Siap... Fokus!</div>
+                        <div id="f-target" class="hidden"></div>
                     </div>
+                    <p class="text-center text-[10px] text-slate-400 mt-6 font-bold uppercase tracking-widest italic">Klik logo Wijaya secepat mungkin!</p>
                 </div>
 
-                <!-- RESULT -->
-                <div id="view-result" class="view p-8 items-center justify-center text-center space-y-12 animate-pop">
-                    <div id="res-circle" class="w-56 h-56 rounded-[4.5rem] bg-orange-500 flex flex-col items-center justify-center text-white shadow-2xl rotate-3">
+                <!-- RESULT VIEW -->
+                <div id="view-result" class="view items-center justify-center text-center space-y-12 animate-pop p-8">
+                    <div id="res-circle" class="w-60 h-60 rounded-[4.5rem] bg-orange-500 flex flex-col items-center justify-center text-white shadow-2xl rotate-3">
                         <div class="w-full h-full rounded-[4.2rem] bg-slate-900/10 backdrop-blur-md flex flex-col items-center justify-center -rotate-3 border border-white/20">
-                            <span id="res-score" class="text-6xl font-black italic tracking-tighter">0</span>
-                            <span id="res-lbl" class="text-[10px] font-black uppercase tracking-[0.4em] mt-3">FINAL SCORE</span>
+                            <span id="res-val" class="text-7xl font-black italic tracking-tighter leading-none">0</span>
+                            <span id="res-label" class="text-[10px] font-black uppercase tracking-[0.4em] mt-3">Skor Final</span>
                         </div>
                     </div>
-                    <div class="space-y-4">
-                        <h3 class="text-4xl font-black italic text-slate-800 uppercase leading-none">Impresif! 🔥</h3>
-                        <p class="text-slate-400 text-sm font-medium leading-relaxed italic">Hasil ini menunjukkan potensi lo yang sebenernya. Mau analisis fungsional?</p>
+                    <div class="space-y-3">
+                        <h3 class="text-4xl font-black italic tracking-tighter text-slate-800 uppercase leading-none">Impresif! 🔥</h3>
+                        <p class="text-slate-400 text-sm font-medium leading-relaxed px-4 italic italic">Gunakan hasil ini buat asah potensi lo lebih dalam. Tanya asisten AI sekarang!</p>
                     </div>
-                    <button id="res-ai-btn" class="w-full p-8 bg-slate-900 text-white font-black rounded-[2.5rem] shadow-2xl active:scale-95 uppercase tracking-widest text-xs italic">Analisis Ahli AI</button>
-                    <button onclick="changeView('menu')" class="text-slate-300 font-bold uppercase tracking-widest text-[9px]">Kembali</button>
+                    <div class="w-full space-y-3">
+                        <button id="res-ai-btn" class="w-full p-8 bg-slate-900 text-white font-black rounded-[2.5rem] shadow-2xl active:scale-95 uppercase tracking-widest text-xs italic">Analisis Ahli AI</button>
+                        <button onclick="showView('menu')" class="w-full p-4 text-slate-300 font-bold uppercase tracking-widest text-[9px]">Kembali ke Menu</button>
+                    </div>
                 </div>
 
-                <!-- CHAT -->
+                <!-- CHAT VIEW -->
                 <div id="view-chat" class="view p-6 pt-2 animate-pop">
-                    <div id="chat-box" class="flex-1 space-y-6 overflow-y-auto pr-1 custom-scrollbar"></div>
-                    <div id="ai-loading" class="hidden items-center gap-3 ml-4 py-2">
+                    <div id="chat-messages" class="flex-1 space-y-6 overflow-y-auto pr-1 custom-scrollbar"></div>
+                    <div id="chat-loading" class="hidden items-center gap-3 ml-4 py-2">
                         <div class="w-2 h-2 rounded-full animate-bounce bg-orange-400"></div>
-                        <span class="text-[10px] font-black text-slate-200 uppercase italic">Berpikir...</span>
+                        <span class="text-[10px] font-black text-slate-200 uppercase tracking-widest italic ml-1">Berpikir...</span>
                     </div>
                     <div class="flex flex-col gap-3 pt-4 shrink-0 border-t border-slate-50">
-                        <div id="stickers" class="flex gap-2 overflow-x-auto pb-3 custom-scrollbar px-2"></div>
+                        <div id="sticker-shelf" class="flex gap-2 overflow-x-auto pb-3 custom-scrollbar px-2"></div>
                         <div class="flex gap-2 items-center">
-                            <input type="text" id="chat-in" placeholder="Tanya Wijaya..." class="flex-1 bg-slate-50 border border-slate-100 rounded-[2rem] px-8 py-5 text-sm focus:ring-4 focus:ring-orange-500/10" />
-                            <button id="chat-send" class="w-16 h-16 bg-orange-500 text-white rounded-[2.5rem] flex items-center justify-center shadow-xl active:scale-90 transition-all"><i data-lucide="send" class="w-6 h-6"></i></button>
+                            <input type="text" id="chat-input-field" placeholder="Tanya Wijaya..." class="flex-1 bg-slate-50 border border-slate-100 rounded-[2rem] px-8 py-5 text-sm focus:ring-4 focus:ring-orange-500/10 placeholder:text-slate-300 shadow-inner" />
+                            <button id="chat-send-btn" class="w-16 h-16 bg-orange-500 text-white rounded-[2.5rem] flex items-center justify-center shadow-xl active:scale-90"><i data-lucide="send" class="w-6 h-6"></i></button>
                         </div>
                     </div>
                 </div>
 
             </div>
 
+            <!-- Footer -->
             <footer class="py-4 bg-white text-center flex items-center justify-center gap-2 shrink-0 border-t border-slate-50">
-               <div id="footer-logo" class="flex gap-2"></div>
-               <p class="text-[8px] text-slate-300 font-black uppercase tracking-[0.5em]">Wijaya+Nura Iq • Production v20.0</p>
+               <div id="footer-logo-icons" class="flex gap-2"></div>
+               <p class="text-[8px] text-slate-300 font-black uppercase tracking-[0.5em]">Wijaya+Nura Iq • v22.0 Final Master</p>
             </footer>
         </div>
     </div>
 
     <script>
-        // --- API KEY CONFIGURATION ---
+        // --- API KEY ---
         const apiKey = "AIzaSyClmquwvdNE6a3Y4s8_durpg4j9LqV163w"; 
 
-        // --- STATE ---
-        let currentAI = 'wijaya';
-        let activeQuestions = [];
-        let quizIndex = 0;
-        let correctAnswers = 0;
-        let quizCategory = '';
-        let hitCount = 0;
-
-        // --- ASSETS ---
-        const logoWijaya = `<svg viewBox="0 0 1024 1024" fill="none"><defs><linearGradient id="gw" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stopColor="#FB923C"/><stop offset="100%" stopColor="#F97316"/></linearGradient></defs><path d="M512 0C140.8 0 0 140.8 0 512C0 883.2 140.8 1024 512 1024C883.2 1024 1024 883.2 1024 512C1024 140.8 883.2 0 512 0Z" fill="url(#gw)" /><path d="M580 180L320 540H480L444 844L704 484H544L580 180Z" fill="white" /></svg>`;
-        const logoNura = `<svg viewBox="0 0 1024 1024" fill="none"><defs><linearGradient id="gn" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stopColor="#2DD4BF"/><stop offset="100%" stopColor="#0D9488"/></linearGradient></defs><circle cx="512" cy="512" r="512" fill="url(#gn)" /><path d="M512 300C400 300 320 380 320 512C320 644 400 724 512 724C624 724 704 644 704 512C704 380 624 300 512 300Z" fill="white" fillOpacity="0.4" /><path d="M512 380C440 380 390 430 390 512C390 594 440 644 512 644C584 644 634 594 634 512C634 430 584 380 512 380Z" fill="white" /></svg>`;
-        const STICKER_DATA = ["✨", "🧠", "🎯", "🔥", "💎", "🌟", "🎉", "💪", "🥗", "🧘", "🧡", "🫂", "😎", "🤔", "🧐", "🚀", "⚡", "🏆"];
-
-        const QUIZ_DATA = {
-            LOGIC: [
-                { q: "2, 4, 8, 16, ... ?", a: ["24", "32", "64", "48"], c: 1 },
+        // --- DATABASE ---
+        const MASTER_DATA = {
+            IQ_LOGIC: [
+                { q: "Deret: 2, 4, 8, 16, ... ?", a: ["24", "32", "64", "48"], c: 1 },
                 { q: "Mana yang bukan kelompok bunga?", a: ["Mawar", "Pepaya", "Melati", "Anggrek"], c: 1 },
                 { q: "Jika 1=5, 2=25, 3=125, maka 4=?", a: ["500", "625", "1000", "250"], c: 1 },
                 { q: "Mana yang lebih besar: 0.5 atau 1/4?", a: ["0.5", "1/4", "Sama", "Nol"], c: 0 },
-                { q: "Pola: 1, 1, 2, 3, 5, ... ?", a: ["7", "8", "9", "10"], c: 1 }
+                { q: "Pola: 1, 1, 2, 3, 5, 8, ... ?", a: ["11", "12", "13", "15"], c: 2 },
+                { q: "Lengkapi deret: 3, 9, 27, 81, ... ?", a: ["120", "243", "162", "300"], c: 1 },
+                { q: "Jika jam menunjukkan pukul 03.15, sudut terkecilnya?", a: ["0°", "7.5°", "15°", "22.5°"], c: 1 },
+                { q: "Pohon : Hutan = Bintang : ... ?", a: ["Bulan", "Langit", "Galaksi", "Malam"], c: 2 },
+                { q: "Semua A adalah B, semua B adalah C. Maka semua A adalah?", a: ["B", "C", "D", "Salah semua"], c: 1 },
+                { q: "Mana yang paling berat: 1kg besi atau 1kg air?", a: ["Besi", "Air", "Sama", "Beda jenis"], c: 2 }
             ],
-            VERBAL: [
-                { q: "KEPALA : TOPI = KAKI : ... ?", a: ["Sepatu", "Celana", "Kaos kaki", "Lari"], c: 0 },
+            IQ_VERBAL: [
+                { q: "KEPALA : TOPI = KAKI : ... ?", a: ["Sepatu", "Celana", "Kaos Kaki", "Lari"], c: 0 },
                 { q: "Lawan kata 'KONVEKS'?", a: ["Datar", "Cekung", "Bulat", "Lebar"], c: 1 },
-                { q: "BUMI : PLANET = MATAHARI : ... ?", a: ["Orbit", "Galaksi", "Bintang", "Bulan"], c: 2 }
-            ],
-            MATH: [
-                { q: "x + 5 = 12, maka 3x = ?", a: ["18", "21", "24", "27"], c: 1 },
-                { q: "20% dari 500?", a: ["50", "80", "100", "120"], c: 2 },
-                { q: "Akar 144 dikali 2?", a: ["24", "28", "32", "36"], c: 0 }
-            ],
-            EQ: [
-                { q: "Teman gagal dan menangis, sikap lo?", a: ["Ejek", "Dengerin & Dampingi", "Cuek", "Ketawa"], c: 1 }
-            ]
-        };
-
-        const $ = (id) => document.getElementById(id);
-
-        function changeView(name) {
-            document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
-            const target = $('view-' + name);
-            if(target) target.classList.add('active');
-            
-            const btn = $('chat-tab-btn');
-            if(name === 'chat') {
-                btn.classList.add(currentAI === 'wijaya' ? 'bg-orange-500' : 'bg-teal-600', 'text-white');
-                btn.classList.remove('bg-slate-50', 'text-slate-300');
-            } else {
-                btn.classList.remove('bg-orange-500', 'bg-teal-600', 'text-white');
-                btn.classList.add('bg-slate-50', 'text-slate-300');
-            }
-        }
-
-        function switchAI() {
-            currentAI = (currentAI === 'wijaya' ? 'nura' : 'wijaya');
-            updateTheme();
-            const box = $('chat-box');
-            box.innerHTML = '';
-            renderMessage('assistant', currentAI === 'wijaya' ? 'Yo! Wijaya aktif. Mari cek potensi fisik & logika lo. 😎' : 'Halo, aku Nura. Hatimu butuh kawan bercerita? Mari kita bicarakan secara privat. 🌿');
-        }
-
-        function updateTheme() {
-            const label = $('ai-label');
-            const hero = $('hero-text');
-            const frame = $('main-frame');
-            const logoHeader = $('
+                { q: "Sinonim 'PROGRESIF'?", a: ["Maju", "Lambat", "Statis", "Kuno"], c: 0 },
+                { q: "AIR : HAUS = MAKANAN : ... ?", a: ["Kenyang", "Lapar", "Lezat", "Nasi"], c: 1 },
+                { q: "Manusia : Oksigen = Ikan : ... ?", a: ["Air", "Insang", "Gelembung", "Makanan"], c: 0 },
+                { q: "Es : Dingin = Api : ... ?", a: ["Arang", "Panas", "Terang", "Bara"], c: 1 },
+                { q: "Buku : Pengetahuan = Cermin : ... ?", a: ["Kaca", "Wajah", "Refleksi", "Frame"], c: 2 },
+                { q: "Dokter : Pasien = Guru : ... ?", a: ["Sekolah", "Buku", "Murid", "Kelas"], c: 2 },
+                { q: "BUMI : PLANET = MATAHARI : ... ?", a: ["Orbit", "Galaksi", "Bintang", "Bulan"], c: 2 },
+                { q: "Lawannya 'EFEKTIF'?", a: ["Efisien", "Mubazir", "Berdaya guna", "Sia-sia"], 
