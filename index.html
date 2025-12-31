@@ -3,86 +3,70 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Wijaya & Nura IQ</title>
+    <title>iqaku - Wijaya & Nura High Class</title>
     <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
     <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        .glass {
-            background: rgba(255, 255, 255, 0.2);
-            backdrop-filter: blur(15px);
-            -webkit-backdrop-filter: blur(15px);
-            border: 1px solid rgba(255, 255, 255, 0.3);
-        }
+        @keyframes shine { from { left: -100%; } to { left: 100%; } }
+        .bg-mewah { background: linear-gradient(135deg, #1e40af 0%, #3b82f6 50%, #f97316 100%); }
+        .glass-card { background: rgba(255, 255, 255, 0.1); backdrop-filter: blur(20px); border: 1px solid rgba(255, 255, 255, 0.25); box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37); }
+        .highlight-button { position: relative; overflow: hidden; }
+        .highlight-button::after { content: ''; position: absolute; top: 0; left: -100%; width: 50%; height: 100%; background: linear-gradient(90deg, transparent, rgba(255,255,255,0.4), transparent); transform: skewX(-25deg); animation: shine 3s infinite; }
     </style>
 </head>
-<body class="bg-gradient-to-br from-blue-600 to-orange-500 min-h-screen">
+<body class="bg-mewah min-h-screen text-white font-sans">
     <div id="root"></div>
 
     <script type="text/babel">
         const apiKey = "AIzaSyClmquwvdNE6a3Y4s8_durpg4j9LqV163w";
 
         const App = () => {
-            const [step, setStep] = React.useState('start');
-            const [currentQ, setCurrentQ] = React.useState(0);
-            const [score, setScore] = React.useState(0);
+            const [menu, setMenu] = React.useState('home');
 
-            const questions = [
-                { q: "Lengkapi deret: 2, 4, 8, 16, ...", a: ["24", "32", "48"], c: 1 },
-                { q: "Jika semua mawar adalah bunga, dan beberapa bunga layu, maka?", a: ["Mawar pasti layu", "Beberapa mawar mungkin layu", "Mawar tidak bisa layu"], c: 1 },
-                { q: "Manakah yang tidak termasuk kelompoknya?", a: ["Semangka", "Melon", "Ayam"], c: 2 }
-            ];
+            // --- MENU UTAMA MEWAH ---
+            if(menu === 'home') return (
+                <div className="max-w-md mx-auto p-6 flex flex-col min-h-screen">
+                    <header className="text-center py-10">
+                        <h1 className="text-6xl font-black italic tracking-tighter drop-shadow-lg">iqaku</h1>
+                        <p className="text-sm tracking-[0.3em] uppercase opacity-80">Wijaya & Nura Excellence</p>
+                    </header>
 
-            const handleAnswer = (idx) => {
-                if(idx === questions[currentQ].c) setScore(score + 10);
-                if(currentQ + 1 < questions.length) {
-                    setCurrentQ(currentQ + 1);
-                } else {
-                    setStep('result');
-                }
-            };
-
-            if(step === 'start') return (
-                <div className="flex flex-col items-center justify-center min-h-screen p-6">
-                    <div className="glass p-10 rounded-3xl text-center text-white shadow-2xl">
-                        <h1 className="text-5xl font-extrabold mb-2">iqaku</h1>
-                        <p className="text-lg mb-8 opacity-90">WIJAYA & NURA PSYCHOLOGY TEST</p>
-                        <button onClick={() => setStep('quiz')} className="bg-white text-blue-600 px-10 py-4 rounded-full font-bold text-xl shadow-lg hover:scale-105 transition">
-                            MULAI TES
-                        </button>
+                    <div className="glass-card rounded-3xl p-6 mb-8 transform transition hover:scale-[1.02]">
+                        <h3 className="text-xl font-bold mb-3 border-b border-white/20 pb-2">Intelligence Core</h3>
+                        <p className="text-sm opacity-90 leading-relaxed italic">
+                            Sistem kami mengukur 3 pilar kecerdasan: <span className="text-orange-300 font-bold">LOGIKA</span> (pola angka), 
+                            <span className="text-blue-300 font-bold"> VERBAL</span> (linguistik), dan 
+                            <span className="text-green-300 font-bold"> SPASIAL</span> (visual 3D).
+                        </p>
                     </div>
-                </div>
-            );
 
-            if(step === 'quiz') return (
-                <div className="flex flex-col items-center justify-center min-h-screen p-6">
-                    <div className="glass p-8 rounded-3xl w-full max-w-md text-white">
-                        <div className="mb-6 flex justify-between items-center text-sm">
-                            <span>Soal {currentQ + 1} dari {questions.length}</span>
-                            <span className="bg-white/30 px-3 py-1 rounded-full">Skor: {score}</span>
-                        </div>
-                        <h2 className="text-2xl font-bold mb-6 leading-tight">{questions[currentQ].q}</h2>
-                        <div className="space-y-4">
-                            {questions[currentQ].a.map((opt, i) => (
-                                <button key={i} onClick={() => handleAnswer(i)} className="w-full text-left p-4 rounded-2xl bg-white/10 hover:bg-white/30 border border-white/20 transition">
-                                    {opt}
-                                </button>
-                            ))}
-                        </div>
+                    <div className="grid gap-4 flex-1">
+                        <button onClick={() => setMenu('iq')} className="highlight-button glass-card p-5 rounded-2xl text-left font-bold text-lg flex items-center justify-between">
+                            <span>🚀 MULAI TES IQ (ACAK 10/100)</span>
+                            <span className="text-2xl">→</span>
+                        </button>
+                        <button onClick={() => setMenu('fokus')} className="glass-card p-5 rounded-2xl text-left font-bold text-lg flex items-center justify-between">
+                            <span>🎯 TES FOKUS KONSENTRASI</span>
+                            <span className="text-2xl">→</span>
+                        </button>
+                        <button onClick={() => setMenu('bmi')} className="glass-card p-5 rounded-2xl text-left font-bold text-lg flex items-center justify-between">
+                            <span>⚖️ ANALISIS OBESITAS (BMI)</span>
+                            <span className="text-2xl">→</span>
+                        </button>
+                        <button onClick={() => setMenu('ai')} className="bg-white text-blue-800 p-6 rounded-3xl text-center font-black text-xl shadow-[0_10px_40px_rgba(255,255,255,0.2)] hover:bg-orange-100 transition">
+                            💬 KONSULTASI AI WIJAYA
+                        </button>
                     </div>
                 </div>
             );
 
             return (
-                <div className="flex flex-col items-center justify-center min-h-screen p-6">
-                    <div className="glass p-10 rounded-3xl text-center text-white shadow-2xl">
-                        <h1 className="text-4xl font-bold mb-2">HASIL TES</h1>
-                        <div className="text-6xl font-black my-6">{score * 4 + 60}</div>
-                        <p className="text-xl mb-8">IQ Anda Terkategorikan Luar Biasa!</p>
-                        <button onClick={() => window.location.reload()} className="bg-orange-400 text-white px-8 py-3 rounded-full font-bold shadow-lg">
-                            COBA LAGI
-                        </button>
+                <div className="p-10 flex flex-col items-center justify-center min-h-screen text-center">
+                    <div className="glass-card p-8 rounded-3xl">
+                        <h2 className="text-2xl font-bold mb-4">Fitur {menu.toUpperCase()} Sedang Sinkronisasi...</h2>
+                        <button onClick={() => setMenu('home')} className="bg-white text-blue-600 px-6 py-2 rounded-full font-bold">Kembali</button>
                     </div>
                 </div>
             );
