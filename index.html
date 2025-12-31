@@ -5,12 +5,14 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Wijaya+Nura Iq</title>
     
-    <!-- CSS & Icons -->
+    <!-- Library Utama (Dengan Fallback Check) -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
     
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap');
+        
+        :root { --w-orange: #f97316; --n-teal: #14b8a6; }
         
         * { 
             -webkit-tap-highlight-color: transparent; 
@@ -19,254 +21,264 @@
             box-sizing: border-box;
         }
         
-        body { background-color: #f8fafc; margin: 0; overflow: hidden; height: 100vh; color: #0f172a; }
-        .view { display: none; height: 100%; flex-direction: column; overflow-y: auto; }
-        .view.active { display: flex; }
-        .custom-scrollbar::-webkit-scrollbar { width: 4px; }
-        .custom-scrollbar::-webkit-scrollbar-thumb { background: rgba(0,0,0,0.05); border-radius: 10px; }
+        body { 
+            background-color: #f8fafc; 
+            margin: 0; 
+            overflow: hidden; 
+            height: 100dvh; /* Dynamic Height untuk Mobile */
+            width: 100vw;
+        }
+
+        /* View Management */
+        .view-layer { 
+            display: none; 
+            height: 100%; 
+            width: 100%;
+            flex-direction: column; 
+            opacity: 0; 
+            transition: opacity 0.2s ease;
+        }
+        .view-layer.active { display: flex; opacity: 1; }
+
+        .custom-scrollbar::-webkit-scrollbar { width: 3px; }
+        .custom-scrollbar::-webkit-scrollbar-thumb { background: rgba(0,0,0,0.1); border-radius: 10px; }
+
+        /* Animations */
+        @keyframes popIn { 0% { transform: scale(0.95); opacity: 0; } 100% { transform: scale(1); opacity: 1; } }
+        .animate-pop { animation: popIn 0.3s cubic-bezier(0.17, 0.67, 0.83, 0.67) forwards; }
         
-        @keyframes pop { 0% { transform: scale(0.9); opacity: 0; } 100% { transform: scale(1); opacity: 1; } }
-        .animate-pop { animation: pop 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
         @keyframes float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-10px); } }
         .animate-float { animation: float 4s ease-in-out infinite; }
-        .sticker-bounce { animation: bounce 2s ease-in-out infinite; }
-        @keyframes bounce { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-15px); } }
 
-        .glass-nav { background: rgba(255, 255, 255, 0.9); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); border-bottom: 1px solid #f1f5f9; }
         .aura-wijaya { background: radial-gradient(circle at top right, rgba(249, 115, 22, 0.1), transparent); }
         .aura-nura { background: radial-gradient(circle at top right, rgba(20, 184, 166, 0.1), transparent); }
-        
-        #focus-target { position: absolute; cursor: pointer; transition: all 0.1s ease; z-index: 10; }
+
+        #loading-screen {
+            position: fixed; inset: 0; background: white; z-index: 9999;
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+        }
+
+        .btn-press:active { transform: scale(0.95); }
     </style>
 </head>
 <body>
 
-    <!-- Splash Screen -->
-    <div id="view-splash" class="view active items-center justify-center bg-white p-8">
-        <div class="flex gap-4 mb-10" id="splash-logos"></div>
-        <h1 class="text-4xl font-black italic text-slate-800 uppercase tracking-tighter">Wijaya+Nura <span class="text-orange-500">Iq</span></h1>
-        <p class="text-[10px] font-bold text-slate-300 uppercase tracking-[0.5em] mt-4">Final Master Edition v23.0</p>
+    <!-- Loading Overlay (Anti Putih) -->
+    <div id="loading-screen">
+        <div class="w-10 h-10 border-4 border-slate-100 border-t-orange-500 rounded-full animate-spin"></div>
+        <p class="mt-4 text-[10px] font-bold text-slate-400 uppercase tracking-widest">Sistem Sedang Dimuat...</p>
     </div>
 
-    <!-- App Shell -->
-    <div id="app-shell" class="hidden h-screen w-full flex items-center justify-center bg-slate-50 md:p-4">
-        <div id="main-frame" class="w-full max-w-md h-full bg-white relative flex flex-col overflow-hidden shadow-2xl md:rounded-[3rem] md:h-[95vh] border border-white aura-wijaya">
+    <!-- App Root -->
+    <div id="app-root" class="hidden h-full w-full flex items-center justify-center">
+        <div id="main-frame" class="w-full max-w-md h-full bg-white relative flex flex-col overflow-hidden shadow-2xl md:rounded-[3rem] md:h-[95vh] border border-white aura-wijaya transition-colors duration-500">
             
-            <!-- Header -->
-            <header class="px-6 py-5 flex items-center justify-between glass-nav z-50 shrink-0">
-                <div class="flex items-center gap-3 cursor-pointer" onclick="showView('menu')">
-                    <div id="header-logo" class="w-8 h-8"></div>
+            <!-- Global Header -->
+            <header class="px-6 py-5 flex items-center justify-between bg-white/80 backdrop-blur-md border-b border-slate-50 z-50 shrink-0">
+                <div class="flex items-center gap-3 cursor-pointer" onclick="changeView('menu')">
+                    <div id="active-logo" class="w-8 h-8"></div>
                     <div class="flex flex-col">
-                        <span class="font-black italic text-sm text-slate-800 leading-none">Wijaya+Nura Iq</span>
-                        <span id="ai-label" class="text-[8px] font-bold uppercase tracking-widest mt-1 text-orange-500">Logic Pro</span>
+                        <span class="font-black italic text-sm text-slate-800 tracking-tight leading-none uppercase">Wijaya+Nura</span>
+                        <span id="role-tag" class="text-[8px] font-bold uppercase tracking-widest mt-1 text-orange-500">Logic Master</span>
                     </div>
                 </div>
                 <div class="flex items-center gap-2">
-                    <button onclick="toggleAI()" class="px-3 py-1.5 rounded-full border border-slate-100 text-[9px] font-black uppercase transition-all bg-slate-50 flex items-center gap-2">
-                        <i data-lucide="refresh-cw" class="w-3 h-3"></i> Switch
+                    <button onclick="switchMode()" class="px-3 py-1.5 rounded-full border border-slate-100 text-[9px] font-black uppercase bg-slate-50 flex items-center gap-2 btn-press">
+                        <i data-lucide="refresh-cw" class="w-3 h-3"></i> <span id="switch-text">Nura</span>
                     </button>
-                    <button onclick="showView('chat')" id="chat-tab-btn" class="w-10 h-10 rounded-xl flex items-center justify-center transition-all bg-slate-50 text-slate-300">
+                    <button onclick="changeView('chat')" id="chat-tab-icon" class="w-10 h-10 rounded-xl flex items-center justify-center bg-slate-50 text-slate-300 transition-all">
                         <i data-lucide="sparkles" class="w-5 h-5"></i>
                     </button>
                 </div>
             </header>
 
-            <!-- Content Area -->
-            <div id="view-container" class="flex-1 relative overflow-hidden">
+            <!-- Viewport Content -->
+            <div id="viewport" class="flex-1 relative overflow-hidden flex flex-col">
                 
+                <!-- SPLASH -->
+                <div id="view-splash" class="view-layer items-center justify-center bg-white p-8">
+                    <div class="flex gap-4 mb-8" id="splash-logos"></div>
+                    <h1 class="text-4xl font-black italic text-slate-800 tracking-tighter uppercase">Wijaya+Nura <span class="text-orange-500">Iq</span></h1>
+                    <div class="mt-6 px-4 py-1 bg-slate-50 rounded-full text-[8px] font-bold text-slate-400 uppercase tracking-[0.3em]">Immortal Version 24.0</div>
+                </div>
+
                 <!-- MENU -->
-                <div id="view-menu" class="view p-8 space-y-8 animate-pop custom-scrollbar">
+                <div id="view-menu" class="view-layer p-8 space-y-8 overflow-y-auto custom-scrollbar animate-pop">
                     <div class="space-y-1">
-                        <h2 id="menu-hero" class="text-5xl font-extrabold italic tracking-tighter leading-[0.9] text-slate-900 text-left">Optimalkan Potensi.</h2>
-                        <p class="text-slate-400 text-sm font-medium mt-3 leading-relaxed">Pilih tes untuk mulai menganalisis dirimu.</p>
+                        <h2 id="hero-text" class="text-5xl font-extrabold italic tracking-tighter leading-[0.9] text-slate-900">Upgrade Potensimu.</h2>
+                        <p class="text-slate-400 text-sm font-medium mt-4">Analisis kecerdasan & mental tingkat tinggi.</p>
                     </div>
 
-                    <div id="menu-wijaya-content" class="space-y-6">
-                        <p class="text-[10px] font-black uppercase tracking-widest text-slate-300 italic">Triple IQ Hub</p>
+                    <div id="wijaya-menu" class="space-y-6">
+                        <p class="text-[10px] font-black uppercase tracking-widest text-slate-300">Intelligence Test</p>
                         <div class="grid grid-cols-1 gap-3">
-                            <button onclick="startQuiz('IQ_LOGIC')" class="p-6 bg-white border border-slate-100 rounded-[2.5rem] flex items-center gap-5 active:scale-95 shadow-sm group">
-                                <div class="w-12 h-12 rounded-2xl bg-blue-500 flex items-center justify-center text-white shadow-lg"><i data-lucide="brain"></i></div>
-                                <div class="text-left flex-1 font-bold text-slate-700 uppercase text-xs tracking-wider">IQ Logika</div>
+                            <button onclick="startQuiz('LOGIC')" class="p-6 bg-white border border-slate-100 rounded-[2.5rem] flex items-center gap-5 btn-press shadow-sm">
+                                <div class="w-12 h-12 rounded-2xl bg-blue-500 flex items-center justify-center text-white shadow-lg shadow-blue-100"><i data-lucide="brain"></i></div>
+                                <div class="text-left font-bold text-slate-700">IQ LOGIKA <p class="text-[9px] text-slate-300 font-normal">Pola & Kognitif</p></div>
                             </button>
-                            <button onclick="startQuiz('IQ_VERBAL')" class="p-6 bg-white border border-slate-100 rounded-[2.5rem] flex items-center gap-5 active:scale-95 shadow-sm group">
-                                <div class="w-12 h-12 rounded-2xl bg-purple-500 flex items-center justify-center text-white shadow-lg"><i data-lucide="languages"></i></div>
-                                <div class="text-left flex-1 font-bold text-slate-700 uppercase text-xs tracking-wider">IQ Verbal</div>
+                            <button onclick="startQuiz('VERBAL')" class="p-6 bg-white border border-slate-100 rounded-[2.5rem] flex items-center gap-5 btn-press shadow-sm">
+                                <div class="w-12 h-12 rounded-2xl bg-purple-500 flex items-center justify-center text-white shadow-lg shadow-purple-100"><i data-lucide="languages"></i></div>
+                                <div class="text-left font-bold text-slate-700">IQ VERBAL <p class="text-[9px] text-slate-300 font-normal">Bahasa & Analogi</p></div>
                             </button>
-                            <button onclick="startQuiz('IQ_MATH')" class="p-6 bg-white border border-slate-100 rounded-[2.5rem] flex items-center gap-5 active:scale-95 shadow-sm group">
-                                <div class="w-12 h-12 rounded-2xl bg-indigo-500 flex items-center justify-center text-white shadow-lg"><i data-lucide="binary"></i></div>
-                                <div class="text-left flex-1 font-bold text-slate-700 uppercase text-xs tracking-wider">IQ Numerik</div>
+                            <button onclick="startQuiz('MATH')" class="p-6 bg-white border border-slate-100 rounded-[2.5rem] flex items-center gap-5 btn-press shadow-sm">
+                                <div class="w-12 h-12 rounded-2xl bg-indigo-500 flex items-center justify-center text-white shadow-lg shadow-indigo-100"><i data-lucide="binary"></i></div>
+                                <div class="text-left font-bold text-slate-700">IQ NUMERIK <p class="text-[9px] text-slate-300 font-normal">Hitungan Cepat</p></div>
                             </button>
-                            <div class="grid grid-cols-2 gap-3 mt-1">
-                                <button onclick="startFocus()" class="p-5 bg-amber-50 border border-amber-100 rounded-[2rem] flex flex-col items-center gap-2 active:scale-95 shadow-sm">
-                                    <div class="w-10 h-10 rounded-2xl bg-amber-500 flex items-center justify-center text-white shadow-lg"><i data-lucide="zap"></i></div>
-                                    <span class="font-black text-[9px] text-amber-600 uppercase tracking-tighter">Fokus</span>
-                                </button>
-                                <button onclick="showView('health')" class="p-5 bg-orange-50 border border-orange-100 rounded-[2rem] flex flex-col items-center gap-2 active:scale-95 shadow-sm">
-                                    <div class="w-10 h-10 rounded-2xl bg-orange-500 flex items-center justify-center text-white shadow-lg"><i data-lucide="activity"></i></div>
-                                    <span class="font-black text-[9px] text-orange-600 uppercase tracking-tighter">Obesitas</span>
-                                </button>
-                            </div>
                         </div>
                     </div>
 
-                    <div id="menu-nura-content" class="space-y-6 hidden">
-                        <p class="text-[10px] font-black uppercase tracking-widest text-slate-300 italic">Soul Support</p>
-                        <button onclick="showView('chat')" class="w-full p-8 bg-teal-50 border-2 border-dashed border-teal-200 rounded-[3.5rem] flex items-center gap-6 active:scale-95 shadow-sm">
-                            <div class="w-16 h-16 rounded-[1.8rem] bg-teal-500 flex items-center justify-center text-white shadow-xl shadow-teal-100"><i data-lucide="flower"></i></div>
+                    <div id="nura-menu" class="space-y-6 hidden">
+                        <p class="text-[10px] font-black uppercase tracking-widest text-slate-300">Psychology Area</p>
+                        <button onclick="changeView('chat')" class="w-full p-8 bg-teal-50 border-2 border-dashed border-teal-200 rounded-[3.5rem] flex items-center gap-6 btn-press group">
+                            <div class="w-16 h-16 rounded-[1.8rem] bg-teal-500 flex items-center justify-center text-white shadow-xl"><i data-lucide="flower"></i></div>
                             <div class="text-left flex-1 font-black text-2xl text-teal-900 leading-none">Curhat</div>
                             <i data-lucide="arrow-right" class="text-teal-300"></i>
                         </button>
-                        <button onclick="startQuiz('EQ')" class="p-6 bg-white border border-slate-100 rounded-[2.5rem] flex items-center gap-5 active:scale-95 shadow-sm group">
+                        <button onclick="startQuiz('EQ')" class="p-6 bg-white border border-slate-100 rounded-[2.5rem] flex items-center gap-5 btn-press shadow-sm">
                             <div class="w-12 h-12 rounded-2xl bg-rose-500 flex items-center justify-center text-white shadow-lg"><i data-lucide="heart"></i></div>
-                            <div class="text-left flex-1 font-bold text-slate-700 uppercase text-xs tracking-widest">Kecerdasan Emosi</div>
+                            <div class="text-left font-bold text-slate-700">KECERDASAN EMOSI</div>
                         </button>
                     </div>
 
-                    <button onclick="showView('chat')" class="w-full p-7 bg-slate-900 text-white rounded-[2.5rem] font-black uppercase italic tracking-widest text-xs flex items-center justify-center gap-4 shadow-2xl active:scale-95 transition-all mt-4">
-                         Chat Dengan AI
-                    </button>
+                    <div class="grid grid-cols-2 gap-3">
+                        <button onclick="startFocusTest()" class="p-5 bg-amber-50 border border-amber-100 rounded-[2rem] flex flex-col items-center gap-2 btn-press shadow-sm">
+                            <div class="w-10 h-10 rounded-2xl bg-amber-500 flex items-center justify-center text-white shadow-lg"><i data-lucide="zap"></i></div>
+                            <span class="font-black text-[9px] text-amber-600 uppercase">Fokus</span>
+                        </button>
+                        <button onclick="changeView('health')" class="p-5 bg-orange-50 border border-orange-100 rounded-[2rem] flex flex-col items-center gap-2 btn-press shadow-sm">
+                            <div class="w-10 h-10 rounded-2xl bg-orange-500 flex items-center justify-center text-white shadow-lg"><i data-lucide="activity"></i></div>
+                            <span class="font-black text-[9px] text-orange-600 uppercase">Obesitas</span>
+                        </button>
+                    </div>
                 </div>
 
-                <!-- QUIZ VIEW -->
-                <div id="view-quiz" class="view pt-4 space-y-8 animate-pop p-8">
-                    <div class="flex justify-between items-center text-[10px] font-black text-orange-500 uppercase tracking-widest">
-                        <span id="quiz-cat-label">MODE</span>
-                        <span id="quiz-progress-label">1/10</span>
+                <!-- QUIZ -->
+                <div id="view-quiz" class="view-layer p-8 pt-4 space-y-8 animate-pop">
+                    <div class="flex justify-between items-center text-[10px] font-black text-orange-500 uppercase">
+                        <span id="quiz-title">TEST</span>
+                        <span id="quiz-info">1/10</span>
                     </div>
-                    <div class="w-full bg-slate-100 h-2 rounded-full overflow-hidden">
-                        <div id="quiz-progress-bar" class="h-full bg-orange-500 transition-all duration-500" style="width: 10%"></div>
+                    <div class="w-full bg-slate-100 h-2 rounded-full overflow-hidden shadow-inner">
+                        <div id="quiz-progress" class="h-full bg-orange-500 transition-all duration-500" style="width: 10%"></div>
                     </div>
                     <div class="bg-white p-10 rounded-[3rem] border border-slate-100 shadow-sm text-center flex items-center justify-center min-h-[14rem] relative overflow-hidden">
-                        <div class="absolute top-0 right-0 w-24 h-24 bg-orange-50 rounded-full -mr-12 -mt-12 opacity-50 blur-2xl"></div>
-                        <h2 id="q-text" class="text-2xl font-bold text-slate-800 leading-snug">Memuat...</h2>
+                        <h2 id="question-label" class="text-2xl font-bold text-slate-800 leading-snug">Memuat...</h2>
                     </div>
-                    <div id="q-options" class="grid gap-3"></div>
+                    <div id="options-box" class="grid gap-3"></div>
                 </div>
 
-                <!-- FOCUS VIEW -->
-                <div id="view-focus" class="view pt-4 animate-pop p-8">
-                    <div class="flex justify-between items-center text-[10px] font-black text-orange-500 uppercase tracking-widest mb-4">
-                        <span>Reflex Master</span>
-                        <span id="f-count">0/5 Hit</span>
-                    </div>
-                    <div id="f-area" class="flex-1 bg-slate-50 rounded-[4rem] border-2 border-dashed border-slate-200 relative overflow-hidden shadow-inner flex items-center justify-center">
-                        <div id="f-placeholder" class="text-slate-300 font-black italic uppercase text-xs">Fokus... Tunggu...</div>
-                        <div id="f-target" class="hidden"></div>
-                    </div>
-                </div>
-
-                <!-- HEALTH VIEW -->
-                <div id="view-health" class="view items-center justify-center space-y-8 animate-pop p-8">
+                <!-- HEALTH -->
+                <div id="view-health" class="view-layer p-8 items-center justify-center space-y-8 animate-pop">
                     <h2 class="text-4xl font-black text-slate-900 italic text-center tracking-tighter">Status Tubuh.</h2>
                     <div class="w-full space-y-5 px-2">
                         <div class="space-y-2">
                             <label class="text-[10px] font-black uppercase tracking-widest text-slate-300 ml-5">Tinggi (cm)</label>
-                            <input type="number" id="in-height" placeholder="Contoh: 175" class="w-full p-6 bg-slate-50 border border-slate-100 rounded-[2rem] focus:ring-4 focus:ring-orange-500/10 text-sm shadow-inner" />
+                            <input type="number" id="h-val" placeholder="Contoh: 175" class="w-full p-6 bg-slate-50 border border-slate-100 rounded-[2rem] focus:ring-4 focus:ring-orange-500/10 text-sm shadow-inner" />
                         </div>
                         <div class="space-y-2">
                             <label class="text-[10px] font-black uppercase tracking-widest text-slate-300 ml-5">Berat (kg)</label>
-                            <input type="number" id="in-weight" placeholder="Contoh: 70" class="w-full p-6 bg-slate-50 border border-slate-100 rounded-[2rem] focus:ring-4 focus:ring-orange-500/10 text-sm shadow-inner" />
+                            <input type="number" id="w-val" placeholder="Contoh: 70" class="w-full p-6 bg-slate-50 border border-slate-100 rounded-[2rem] focus:ring-4 focus:ring-orange-500/10 text-sm shadow-inner" />
                         </div>
-                        <button onclick="calculateBMI()" class="w-full p-7 bg-orange-500 text-white font-black rounded-[2.5rem] shadow-xl active:scale-95 uppercase tracking-widest text-xs italic">Cek Hasil!</button>
+                        <button onclick="calculateHealth()" class="w-full p-7 bg-orange-500 text-white font-black rounded-[2.5rem] shadow-xl btn-press uppercase tracking-widest text-xs italic">Cek Hasil!</button>
                     </div>
                 </div>
 
-                <!-- RESULT VIEW -->
-                <div id="view-result" class="view items-center justify-center text-center space-y-12 animate-pop p-8">
-                    <div id="res-circle" class="w-60 h-60 rounded-[4.5rem] bg-orange-500 flex flex-col items-center justify-center text-white shadow-2xl rotate-3">
+                <!-- FOCUS -->
+                <div id="view-focus" class="view-layer p-8 pt-4 animate-pop">
+                    <div class="flex justify-between items-center text-[10px] font-black text-orange-500 uppercase tracking-widest mb-4">
+                        <span>Reflex Challenge</span>
+                        <span id="f-score-label">0/5 Hit</span>
+                    </div>
+                    <div id="f-box" class="flex-1 bg-slate-50 rounded-[4rem] border-2 border-dashed border-slate-200 relative overflow-hidden flex items-center justify-center">
+                        <div id="f-target" class="hidden cursor-pointer" style="position:absolute;"></div>
+                        <div id="f-idle" class="text-slate-300 font-black italic uppercase text-xs">Siap...</div>
+                    </div>
+                </div>
+
+                <!-- RESULT -->
+                <div id="view-result" class="view-layer p-8 items-center justify-center text-center space-y-12 animate-pop">
+                    <div id="res-aura" class="w-64 h-64 rounded-[4.5rem] bg-orange-500 flex flex-col items-center justify-center text-white shadow-2xl rotate-3">
                         <div class="w-full h-full rounded-[4.2rem] bg-slate-900/10 backdrop-blur-md flex flex-col items-center justify-center -rotate-3 border border-white/20">
-                            <span id="res-val" class="text-7xl font-black italic tracking-tighter leading-none">0</span>
-                            <span id="res-label" class="text-[10px] font-black uppercase tracking-[0.4em] mt-3">Hasil Akhir</span>
+                            <span id="res-score-val" class="text-7xl font-black italic tracking-tighter">0</span>
+                            <span id="res-type-lbl" class="text-[10px] font-black uppercase tracking-[0.4em] mt-3">Final Score</span>
                         </div>
                     </div>
-                    <div class="space-y-3 px-4">
+                    <div class="space-y-4 px-4">
                         <h3 class="text-4xl font-black italic tracking-tighter text-slate-800 uppercase leading-none">Impresif! 🔥</h3>
-                        <p class="text-slate-400 text-sm font-medium leading-relaxed italic">Mau analisis fungsional dari ahlinya? Tanya AI sekarang!</p>
+                        <p class="text-slate-400 text-sm font-medium leading-relaxed italic">Mau tau analisis fungsional dari ahlinya? Tanya AI sekarang!</p>
                     </div>
-                    <button id="res-ai-btn" class="w-full p-8 bg-slate-900 text-white font-black rounded-[2.5rem] shadow-2xl active:scale-95 uppercase tracking-widest text-xs italic">Analisis Ahli AI</button>
-                    <button onclick="showView('menu')" class="text-slate-300 font-bold uppercase tracking-widest text-[9px]">Kembali</button>
+                    <button id="ai-analyze-trigger" class="w-full p-8 bg-slate-900 text-white font-black rounded-[2.5rem] shadow-2xl btn-press uppercase tracking-widest text-xs italic">Analisis Ahli AI</button>
+                    <button onclick="changeView('menu')" class="text-slate-300 font-bold uppercase tracking-widest text-[9px]">Menu Utama</button>
                 </div>
 
-                <!-- CHAT VIEW -->
-                <div id="view-chat" class="view p-6 pt-2 animate-pop">
-                    <div id="chat-messages" class="flex-1 space-y-6 overflow-y-auto pr-1 custom-scrollbar"></div>
-                    <div id="chat-loading" class="hidden items-center gap-3 ml-4 py-3">
+                <!-- CHAT -->
+                <div id="view-chat" class="view-layer p-6 pt-2 animate-pop">
+                    <div id="chat-scroller" class="flex-1 space-y-6 overflow-y-auto pr-1 custom-scrollbar"></div>
+                    <div id="ai-typing" class="hidden items-center gap-3 ml-4 py-3">
                         <div class="w-2 h-2 rounded-full animate-bounce bg-orange-400"></div>
                         <span class="text-[10px] font-black text-slate-200 uppercase italic">Berpikir...</span>
                     </div>
                     <div class="flex flex-col gap-3 pt-4 shrink-0 border-t border-slate-50">
-                        <div id="sticker-shelf" class="flex gap-2 overflow-x-auto pb-3 custom-scrollbar px-2"></div>
+                        <div id="sticker-bar" class="flex gap-2 overflow-x-auto pb-3 custom-scrollbar"></div>
                         <div class="flex gap-2 items-center">
-                            <label for="img-upload" class="w-14 h-14 bg-slate-50 border border-slate-100 rounded-2xl flex items-center justify-center cursor-pointer active:scale-90 shadow-sm text-slate-400 hover:text-orange-500 transition-all">
+                            <label for="camera-input" class="w-14 h-14 bg-slate-50 border border-slate-100 rounded-2xl flex items-center justify-center cursor-pointer active:scale-90 text-slate-400">
                                 <i data-lucide="camera" class="w-5 h-5"></i>
-                                <input type="file" id="img-upload" class="hidden" accept="image/*" onchange="handleImage(event)" />
+                                <input type="file" id="camera-input" class="hidden" accept="image/*" onchange="handleFileUpload(event)" />
                             </label>
-                            <input type="text" id="chat-input-field" placeholder="Tanya sesuatu..." class="flex-1 bg-slate-50 border border-slate-100 rounded-[2rem] px-8 py-5 text-sm focus:ring-4 focus:ring-orange-500/10 placeholder:text-slate-300 shadow-inner" />
-                            <button id="chat-send-btn" class="w-16 h-16 bg-orange-500 text-white rounded-[2.5rem] flex items-center justify-center shadow-xl active:scale-90 transition-all"><i data-lucide="send" class="w-6 h-6"></i></button>
+                            <input type="text" id="chat-input" placeholder="Tanya..." class="flex-1 bg-slate-50 border border-slate-100 rounded-[2rem] px-8 py-5 text-sm focus:ring-4 focus:ring-orange-500/10" />
+                            <button id="btn-send" class="w-16 h-16 bg-orange-500 text-white rounded-[2.5rem] flex items-center justify-center shadow-xl active:scale-90"><i data-lucide="send" class="w-6 h-6"></i></button>
                         </div>
                     </div>
                 </div>
 
             </div>
 
-            <!-- Footer -->
             <footer class="py-4 bg-white text-center flex items-center justify-center gap-2 shrink-0 border-t border-slate-50">
-               <div id="footer-logo-icons" class="flex gap-2"></div>
-               <p class="text-[8px] text-slate-300 font-black uppercase tracking-[0.5em]">Wijaya+Nura Iq • Final Master v23.0</p>
+               <div id="footer-logos" class="flex gap-2 opacity-30"></div>
+               <p class="text-[8px] text-slate-300 font-black uppercase tracking-[0.5em]">Wijaya+Nura Iq • v24.0 IMMORTAL</p>
             </footer>
         </div>
     </div>
 
     <script>
-        // --- API KEY CONFIGURATION ---
+        // --- API KEY ---
         const apiKey = "AIzaSyClmquwvdNE6a3Y4s8_durpg4j9LqV163w"; 
 
-        // --- GLOBAL STATE ---
-        let state = {
-            ai: 'wijaya',
-            view: 'splash',
-            quizActiveCat: '',
-            quizQuestions: [],
-            quizIndex: 0,
-            quizCorrect: 0,
-            fHits: 0,
-            currentImage: null
-        };
-
-        const $ = (id) => document.getElementById(id);
-
-        const STICKER_LIST = ["✨", "🧠", "🎯", "🔥", "💎", "🌟", "🎉", "💪", "🥗", "🧘", "🧡", "🫂", "😎", "🤔", "🧐", "🚀", "⚡", "🏆"];
-
-        const MASTER_BANK = {
+        // --- DATABASE ---
+        const MASTER_DB = {
             IQ_LOGIC: [
-                { q: "2, 4, 8, 16, ... ?", a: ["24", "32", "64", "48"], c: 1 },
+                { q: "Deret: 2, 4, 8, 16, ... ?", a: ["24", "32", "64", "48"], c: 1 },
                 { q: "Mana yang bukan kelompok bunga?", a: ["Mawar", "Pepaya", "Melati", "Anggrek"], c: 1 },
                 { q: "Jika 1=5, 2=25, 3=125, maka 4=?", a: ["500", "625", "1000", "250"], c: 1 },
                 { q: "Mana yang lebih besar: 0.5 atau 1/4?", a: ["0.5", "1/4", "Sama", "Nol"], c: 0 },
                 { q: "Pola: 1, 1, 2, 3, 5, 8, ... ?", a: ["11", "12", "13", "15"], c: 2 },
-                { q: "Berapa banyak bulan punya 28 hari?", a: ["1", "2", "6", "12"], c: 3 },
-                { q: "Mana yang lebih berat: 1kg besi atau 1kg air?", a: ["Besi", "Air", "Sama", "Berbeda"], c: 2 },
-                { q: "Lengkapi: A, C, E, G, ... ?", a: ["H", "I", "J", "K"], c: 1 },
+                { q: "3, 9, 27, 81, ... ?", a: ["120", "243", "162", "300"], c: 1 },
+                { q: "Jika jam 03.15, sudut terkecilnya?", a: ["0°", "7.5°", "15°", "22.5°"], c: 1 },
                 { q: "Pohon : Hutan = Bintang : ... ?", a: ["Bulan", "Langit", "Galaksi", "Malam"], c: 2 },
-                { q: "Jika jam pukul 03.15, sudut terkecilnya?", a: ["0°", "7.5°", "15°", "22.5°"], c: 1 }
+                { q: "Semua mawar adalah bunga. Bunga itu merah. Maka?", a: ["Semua bunga mawar", "Mawar itu merah", "Merah itu mawar", "Salah semua"], c: 1 },
+                { q: "1kg besi vs 1kg air, berat mana?", a: ["Besi", "Air", "Sama", "Beda"], c: 2 }
             ],
             IQ_VERBAL: [
-                { q: "KEPALA : TOPI = KAKI : ... ?", a: ["Sepatu", "Lari", "Celana", "Kaos kaki"], c: 0 },
+                { q: "KEPALA : TOPI = KAKI : ... ?", a: ["Sepatu", "Celana", "Kaos Kaki", "Lari"], c: 0 },
                 { q: "Lawan kata 'KONVEKS'?", a: ["Datar", "Cekung", "Bulat", "Lebar"], c: 1 },
-                { q: "AIR : HAUS = MAKANAN : ... ?", a: ["Kenyang", "Lapar", "Lezat", "Nasi"], c: 1 },
-                { q: "BUMI : PLANET = MATAHARI : ... ?", a: ["Orbit", "Galaksi", "Bintang", "Bulan"], c: 2 },
-                { q: "Sinonim 'PROGRESIF'?", a: ["Maju", "Lambat", "Statis", "Kuno"], c: 0 }
+                { q: "Sinonim 'PROGRESIF'?", a: ["Maju", "Lambat", "Statis", "Kuno"], c: 0 },
+                { q: "Buku : Pengetahuan = Cermin : ... ?", a: ["Kaca", "Wajah", "Refleksi", "Frame"], c: 2 },
+                { q: "Dokter : Pasien = Guru : ... ?", a: ["Sekolah", "Buku", "Murid", "Kelas"], c: 2 }
             ],
             IQ_MATH: [
                 { q: "x + 5 = 12, maka 3x = ?", a: ["18", "21", "24", "27"], c: 1 },
-                { q: "Berapa 20% dari 500?", a: ["50", "80", "100", "120"], c: 2 },
-                { q: "Akar 144 dikali 2?", a: ["24", "28", "32", "36"], c: 0 },
-                { q: "Jika 1 kodi = 20 buah, 5 kodi = ?", a: ["80", "100", "120", "150"], c: 1 },
-                { q: "Jika a=2, b=3, c=a*b+a. Nilai c?", a: ["6", "7", "8", "9"], c: 2 }
+                { q: "20% dari 500?", a: ["50", "80", "100", "120"], c: 2 },
+                { q: "Akar 625 dikali 2 adalah?", a: ["40", "50", "60", "70"], c: 1 },
+                { q: "Jika 5 mesin buat 5 baju dalam 5 menit, 100 mesin buat baju dalam?", a: ["1 menit", "5 menit", "20 menit", "100 menit"], c: 1 },
+                { q: "Radius 7, berapakah Luas Lingkaran?", a: ["44", "154", "49", "196"], c: 1 }
             ],
             EQ: [
-                { q: "Teman gagal dan menangis, respon lo?", a: ["Ejek", "Dengerin & Dampingi", "Cuek", "Ketawa"], c: 1 }
+                { q: "Teman gagal dan menangis, respon lo?", a: ["Ejek", "Dengerin & Dampingi", "Cuek", "Ketawa"], c: 1 },
+                { q: "Dikritik keras di publik, sikap lo?", a: ["Balas marah", "Tenang & Evaluasi", "Nangis", "Blokir"], c: 1 }
             ]
         };
 
-        const logoWStr = `<svg viewBox="0 0 1024 1024" fill="none"><defs><linearGradient id="gw" x1="0%" 
+        const STICKER_ICONS = ["✨", "🧠", "🎯", "🔥", "💎", "🌟", "🎉", "💪", "🥗", "🧘", "🧡", "🫂", "😎", "🤔", "🧐", "🚀", "⚡", "🏆"];
+
+        // --- ASSETS ---
+        const svgW = `<svg viewBox="0 0 1024 1024" fill="none"><defs><linearGradient id="gw" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" sto
