@@ -1,72 +1,82 @@
-<!DOCTYPE html>
+<<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>iqaku - Wijaya & Nura High Class</title>
+    <title>iqaku - Wijaya & Nura Original</title>
     <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
     <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
+        /* Gradasi asli: Biru ke Oranye */
+        .bg-original { background: linear-gradient(135deg, #2563eb 0%, #f97316 100%); }
+        /* Glassmorphism Highlight */
+        .glass-mewah { 
+            background: rgba(255, 255, 255, 0.2); 
+            backdrop-filter: blur(12px); 
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.3); 
+        }
         @keyframes shine { from { left: -100%; } to { left: 100%; } }
-        .bg-mewah { background: linear-gradient(135deg, #1e40af 0%, #3b82f6 50%, #f97316 100%); }
-        .glass-card { background: rgba(255, 255, 255, 0.1); backdrop-filter: blur(20px); border: 1px solid rgba(255, 255, 255, 0.25); box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37); }
-        .highlight-button { position: relative; overflow: hidden; }
-        .highlight-button::after { content: ''; position: absolute; top: 0; left: -100%; width: 50%; height: 100%; background: linear-gradient(90deg, transparent, rgba(255,255,255,0.4), transparent); transform: skewX(-25deg); animation: shine 3s infinite; }
+        .highlight { position: relative; overflow: hidden; }
+        .highlight::after { 
+            content: ''; position: absolute; top: 0; left: -100%; width: 50%; height: 100%; 
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.4), transparent); 
+            animation: shine 3s infinite; 
+        }
     </style>
 </head>
-<body class="bg-mewah min-h-screen text-white font-sans">
+<body class="bg-original min-h-screen text-white font-sans">
     <div id="root"></div>
 
     <script type="text/babel">
+        // API KEY TETAP DALAM SATU BARIS (ANTI PUTIH)
         const apiKey = "AIzaSyClmquwvdNE6a3Y4s8_durpg4j9LqV163w";
 
         const App = () => {
-            const [menu, setMenu] = React.useState('home');
+            const [page, setPage] = React.useState('home');
 
-            // --- MENU UTAMA MEWAH ---
-            if(menu === 'home') return (
+            if(page === 'home') return (
                 <div className="max-w-md mx-auto p-6 flex flex-col min-h-screen">
-                    <header className="text-center py-10">
-                        <h1 className="text-6xl font-black italic tracking-tighter drop-shadow-lg">iqaku</h1>
-                        <p className="text-sm tracking-[0.3em] uppercase opacity-80">Wijaya & Nura Excellence</p>
+                    <header className="text-center py-12">
+                        <h1 className="text-7xl font-black italic tracking-tighter drop-shadow-2xl">iqaku</h1>
+                        <p className="text-xs tracking-[0.3em] opacity-80 uppercase font-bold">Wijaya & Nura Psychology</p>
                     </header>
 
-                    <div className="glass-card rounded-3xl p-6 mb-8 transform transition hover:scale-[1.02]">
-                        <h3 className="text-xl font-bold mb-3 border-b border-white/20 pb-2">Intelligence Core</h3>
-                        <p className="text-sm opacity-90 leading-relaxed italic">
-                            Sistem kami mengukur 3 pilar kecerdasan: <span className="text-orange-300 font-bold">LOGIKA</span> (pola angka), 
-                            <span className="text-blue-300 font-bold"> VERBAL</span> (linguistik), dan 
-                            <span className="text-green-300 font-bold"> SPASIAL</span> (visual 3D).
+                    <div className="glass-mewah rounded-[2rem] p-6 mb-8 highlight">
+                        <h3 className="text-lg font-bold mb-3 border-b border-white/20 pb-2 text-white">Analisis Kecerdasan</h3>
+                        <p className="text-sm leading-relaxed opacity-90">
+                            Mengukur potensi <span className="font-bold">Logika</span>, <span className="font-bold">Verbal</span>, dan <span className="font-bold">Spasial</span> dengan standar internasional.
                         </p>
                     </div>
 
                     <div className="grid gap-4 flex-1">
-                        <button onClick={() => setMenu('iq')} className="highlight-button glass-card p-5 rounded-2xl text-left font-bold text-lg flex items-center justify-between">
-                            <span>🚀 MULAI TES IQ (ACAK 10/100)</span>
-                            <span className="text-2xl">→</span>
+                        <button onClick={() => setPage('quiz')} className="glass-mewah p-5 rounded-2xl font-black text-left flex justify-between items-center hover:bg-white/30 transition">
+                            <span>🚀 MULAI TES IQ (100 SOAL)</span>
+                            <span className="text-xl">→</span>
                         </button>
-                        <button onClick={() => setMenu('fokus')} className="glass-card p-5 rounded-2xl text-left font-bold text-lg flex items-center justify-between">
+                        <button onClick={() => setPage('focus')} className="glass-mewah p-5 rounded-2xl font-bold text-left flex justify-between items-center opacity-90">
                             <span>🎯 TES FOKUS KONSENTRASI</span>
-                            <span className="text-2xl">→</span>
+                            <span>→</span>
                         </button>
-                        <button onClick={() => setMenu('bmi')} className="glass-card p-5 rounded-2xl text-left font-bold text-lg flex items-center justify-between">
+                        <button onClick={() => setPage('bmi')} className="glass-mewah p-5 rounded-2xl font-bold text-left flex justify-between items-center opacity-90">
                             <span>⚖️ ANALISIS OBESITAS (BMI)</span>
-                            <span className="text-2xl">→</span>
+                            <span>→</span>
                         </button>
-                        <button onClick={() => setMenu('ai')} className="bg-white text-blue-800 p-6 rounded-3xl text-center font-black text-xl shadow-[0_10px_40px_rgba(255,255,255,0.2)] hover:bg-orange-100 transition">
-                            💬 KONSULTASI AI WIJAYA
+                        <button onClick={() => setPage('ai')} className="bg-white text-blue-600 p-6 rounded-3xl font-black text-xl shadow-2xl hover:scale-105 active:scale-95 transition-all">
+                            💬 TANYA AI WIJAYA
                         </button>
                     </div>
                 </div>
             );
 
             return (
-                <div className="p-10 flex flex-col items-center justify-center min-h-screen text-center">
-                    <div className="glass-card p-8 rounded-3xl">
-                        <h2 className="text-2xl font-bold mb-4">Fitur {menu.toUpperCase()} Sedang Sinkronisasi...</h2>
-                        <button onClick={() => setMenu('home')} className="bg-white text-blue-600 px-6 py-2 rounded-full font-bold">Kembali</button>
+                <div className="p-10 text-center flex flex-col items-center justify-center min-h-screen">
+                    <div className="glass-mewah p-8 rounded-3xl">
+                        <h2 className="text-2xl font-bold mb-4">Fitur {page.toUpperCase()}</h2>
+                        <p className="mb-6 opacity-80 italic">Sinkronisasi Database 100 Soal...</p>
+                        <button onClick={() => setPage('home')} className="bg-white text-blue-600 px-8 py-2 rounded-full font-black shadow-lg">KEMBALI</button>
                     </div>
                 </div>
             );
